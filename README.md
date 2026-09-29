@@ -1,34 +1,77 @@
 # pybindcef
 High-performance Python bindings for Chromium Embedded Framework (CEF)
 
-**Experimental and it works damn good.**
-
 Video testing: https://youtu.be/yWIah-r6sbw?si=O_uNuDDE8uSf6-Nk
 
-> [!NOTE]
-> Complete examples of using with Kivy, Tkinter and PyQt6 are under `tests`.
-
 Thanks to [pybind11](https://github.com/pybind/pybind11) and [CEF](https://github.com/chromiumembedded/cef) for existing in this world.
+This project is inspired from [cefpython](https://github.com/cztomczak/cefpython)
 
-Inspired from [cefpython](https://github.com/cztomczak/cefpython)
+> [!NOTE]
+> Complete examples of using with Kivy, Tkinter and PyQt6 are under `examples`.
 
-<!-- GitAds-Verify: N1APKAO73QIHMPQPGMQSCVEETCXBNDA7 -->
+> [!TIP]
+> NfsBrowser is a modern web browser built with Python, integrating Kivy, CarbonKivy, and the Chromium Embedded Framework (CEF) via pybindcef.
+>
+> https://github.com/Novfensec/NfsBrowser-Desktop
 
 ## GitAds Sponsored
 [![Sponsored by GitAds](https://gitads.dev/v1/ad-serve?source=novfensec/pybindcef@github)](https://gitads.dev/v1/ad-track?source=novfensec/pybindcef@github)
 
 
 ## Financial Support
-If and only if you want to support me anyhow:
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/Novfensec?style=for-the-badge&label=Sponsor%20Novfensec&logo=github&color=000000)](https://github.com/sponsors/Novfensec)
 
 [![Donate via](https://img.shields.io/badge/Donate%20via-Wise-9FE870?style=for-the-badge&logo=wise&labelColor=163300)](https://wise.com/pay/business/kartavyashukla)
 
 [![Donate via PayPal](https://img.shields.io/badge/Donate%20via-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.me/KARTAVYASHUKLA)
 
-[![GitHub Sponsors](https://img.shields.io/github/sponsors/Novfensec?style=for-the-badge&label=Sponsor%20Novfensec&logo=github&color=000000)](https://github.com/sponsors/Novfensec)
 
-## Build Instructions
-Better watch a video: https://youtu.be/3ZYGRoq0yno?si=SHUavAi3QQssk8rD
+## Automated Build Instructions
+> [!NOTE]
+> Only for versions > `0.1.0`
+
+Build and Install using automated build scripts.
+
+Clone the repo locally:
+```sh
+git clone https://github.com/Novfensec/pybindcef -b main --single-branch --depth 1
+cd pybindcef
+```
+
+- Linux:
+    ```sh
+    chmod +x ./build.sh
+    ./build.sh
+    pip install .
+    ```
+
+- Windows (Powershell):
+
+    Install the necessary C++ build tools and CMake using Windows Package Manager (`winget`):
+    > This has to be done only once.
+
+    ```powershell
+    winget install -e --id Microsoft.VisualStudio.BuildTools --override "--passive --wait --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended" --source winget
+    winget install -e --id Kitware.CMake --source winget
+    ```
+
+    - Run the build script in powershell:
+    ```powershell
+    powershell -ExecutionPolicy ByPass -c .\build.ps1
+    ```
+
+    - Then simply install via pip:
+    ```powershell
+    pip install .
+    ```
+
+## Manual Build Instructions
+Better watch a video: 
+- for `v0.1.0`: https://youtu.be/3ZYGRoq0yno?si=SHUavAi3QQssk8rD
+- for `latest`: Not yet out there
+
+<details>
+  <summary>Latest build instructions</summary>
 
 ### Building `libcef_dll_wrapper`
 
@@ -36,7 +79,6 @@ Better watch a video: https://youtu.be/3ZYGRoq0yno?si=SHUavAi3QQssk8rD
 
     Install necessary build tools:
     ```
-    sudo apt update
     sudo apt update
     sudo apt install -y build-essential cmake ninja-build
     ```
@@ -46,7 +88,7 @@ Better watch a video: https://youtu.be/3ZYGRoq0yno?si=SHUavAi3QQssk8rD
     ```bash
     mkdir -p ~/Downloads/cef_binary
 
-    wget https://cef-builds.spotifycdn.com/cef_binary_146.0.9%2Bg3ca6a87%2Bchromium-146.0.7680.165_linux64_minimal.tar.bz2 -O ~/Downloads/cef_binary.tar.bz2
+    wget https://cef-builds.spotifycdn.com/cef_binary_151.3.24%2Bg2384915%2Bchromium-151.0.7922.174_linux64.tar.bz2 -O ~/Downloads/cef_binary.tar.bz2
 
     tar -xjf ~/Downloads/cef_binary.tar.bz2 -C ~/Downloads/cef_binary --strip-components=1
     ```
@@ -58,13 +100,13 @@ Better watch a video: https://youtu.be/3ZYGRoq0yno?si=SHUavAi3QQssk8rD
     cd ~/Downloads/cef_binary/build
 
     cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-    make -j$(nproc)
+    make -j$(nproc) libcef_dll_wrapper
     ```
 
     Confirm the build
 
     ```
-    ls ~/Downloads/cef_binary/build/libcef_dll_wrapper/
+    ls ~/Downloads/cef_binary/build/libcef_dll_wrapper
     ```
 
     A file named `libcef_dll_wrapper.a` will be listed.
@@ -81,14 +123,14 @@ Better watch a video: https://youtu.be/3ZYGRoq0yno?si=SHUavAi3QQssk8rD
     winget install Kitware.CMake
     ```
 
-    Download cef minimal build for your system architecture via https://cef-builds.spotifycdn.com/index.html
+    Download cef minimal/standard build for your system architecture via https://cef-builds.spotifycdn.com/index.html
 
     > **Powershell** commands below
 
     ```powershell
     mkdir $env:USERPROFILE\Downloads\cef_binary
 
-    wget "https://cef-builds.spotifycdn.com/cef_binary_146.0.9%2Bg3ca6a87%2Bchromium-146.0.7680.165_windows64_minimal.tar.bz2" `
+    wget "https://cef-builds.spotifycdn.com/cef_binary_151.3.24%2Bg2384915%2Bchromium-151.0.7922.174_windows64.tar.bz2" `
      -O $env:USERPROFILE\Downloads\cef_binary.tar.bz2
 
     tar -xjf $env:USERPROFILE\Downloads\cef_binary.tar.bz2 -C $env:USERPROFILE\Downloads\cef_binary --strip-components=1
@@ -101,10 +143,12 @@ Better watch a video: https://youtu.be/3ZYGRoq0yno?si=SHUavAi3QQssk8rD
     cd $env:USERPROFILE\Downloads\cef_binary\build
 
     # enable msvc build environment for you system x64 x86_64 x86 amd64
+    # You can start the developer command prompt and type `where vcvarsall` to see the exact path
+    # then simply paste that path to run e.g. C:\Program Files (x86)\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvarsall.bat
     vcvarsall.bat amd64
 
     cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-    cmake --build . --config Release --parallel
+    cmake --build . --config Release --target libcef_dll_wrapper --parallel
     ```
 
     Confirm the build
@@ -121,13 +165,6 @@ PyPI: https://pypi.org/project/pybindcef/
 
 - Linux
 
-    Install bare bones extension from pypi:
-    ```bash
-    pip install pybindcef
-    ```
-
-    OR BUILD FROM SOURCE:
-
     Install pybind11.
 
     ```bash
@@ -140,14 +177,9 @@ PyPI: https://pypi.org/project/pybindcef/
     git clone https://github.com/Novfensec/pybindcef -b main --single-branch --depth 1
     ```
 
-    Now build the extension with `-DPython_EXECUTABLE="pythonexecutablewithversion"`
-
+    Now install via pip:
     ```bash
-    mkdir pybindcef/build
-    cd pybindcef/build
-
-    cmake .. -DPython_EXECUTABLE=/usr/bin/python
-    make
+    pip install .
     ```
 
 - Windows
@@ -164,103 +196,18 @@ PyPI: https://pypi.org/project/pybindcef/
     git clone https://github.com/Novfensec/pybindcef -b main --single-branch --depth 1
     ```
 
-    Now build the extension.
-
+    Now install via pip:
     ```powershell
-    mkdir pybindcef/build
-    cd pybindcef/build
-
-    cmake .. -DCMAKE_BUILD_TYPE=Release
-    cmake --build . --config Release
+    pip install .
     ```
 
-### Building `cef_worker`
+</details>
 
-- Linux
+## Running Examples
 
-    ```bash
-    mkdir pybindcef/cef_worker/build
-    cd pybindcef/cef_worker/build
+After building and installing via `pip install .` (or the automated scripts), you can run the examples directly:
+```bash
+python examples/kivy/main.py
+```
+The python module resolves the bundled CEF dependencies internally.
 
-    cmake ..
-    make
-    ```
-
-- Window
-
-    ```powershell
-    mkdir pybindcef/cef_worker/build
-    cd pybindcef/cef_worker/build
-
-    cmake .. -DCMAKE_BUILD_TYPE=Release
-    cmake --build . --config Release
-    ```
-
-### Extracting resources
-
-- Linux
-
-    Copy all files under `cef_binary/Resources` to `cef_binary/Release`
-
-    ```bash
-    cp -r ~/Downloads/cef_binary/Resources/* ~/Downloads/cef_binary/Release/
-    ```
-
-- Windows
-
-    Copy all files under `cef_binary/Resources` and `cef_binary/Release` right next to the extension from wherever you are accessing it.
-    All you need to do is make `libcef.dll` available in LD_LIBRARY_PATH and place the files under `cef_binary/Resources` next to `libcef.dll` that's it.
-
-## Tests
-
-### Linux
-
-1. Kivy
-
-    - Copy `pybindcef` extension and `cef_worker` executable to `pybindcef/tests/kivy/`.
-    - Run main.py with the python executable version suitable for the extension.
-    ```bash
-    python main.py
-    ```
-
-2. PyQt
-
-    - Copy `pybindcef` extension and `cef_worker` executable to `pybindcef/tests/pyqt/`.
-    - Run main.py with the python executable version suitable for the extension.
-    ```bash
-    python main.py
-    ```
-
-3. Tkinter
-
-    - Copy `pybindcef` extension and `cef_worker` executable to `pybindcef/tests/tkinter/`.
-    - Run main.py with the python executable version suitable for the extension.
-    ```bash
-    python main.py
-    ```
-
-### Windows
-
-1. Kivy
-
-    - Copy `pybindcef` extension and `cef_worker` executable to `pybindcef/tests/kivy/` while also extracting resources as above instructions.
-    - Run main.py with the python executable version suitable for the extension.
-    ```bash
-    python main.py
-    ```
-
-2. PyQt
-
-    - Copy `pybindcef` extension and `cef_worker` executable to `pybindcef/tests/pyqt/` while also extracting resources as above instructions.
-    - Run main.py with the python executable version suitable for the extension.
-    ```bash
-    python main.py
-    ```
-
-3. Tkinter
-
-    - Copy `pybindcef` extension and `cef_worker` executable to `pybindcef/tests/tkinter/` while also extracting resources as above instructions.
-    - Run main.py with the python executable version suitable for the extension.
-    ```bash
-    python main.py
-    ```

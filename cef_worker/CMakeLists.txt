@@ -16,7 +16,7 @@ endif()
 message(STATUS "Building worker with CEF_ROOT: ${CEF_ROOT}")
 
 if(WIN32)
-    add_executable(cef_worker platforms/win/cef_worker.cpp)
+    add_executable(cef_worker WIN32 platforms/win/cef_worker.cpp)
 else()
     add_executable(cef_worker platforms/linux/cef_worker.cpp)
 endif()
@@ -33,6 +33,8 @@ else()
     )
     set_target_properties(cef_worker PROPERTIES
         BUILD_RPATH "${CEF_ROOT}/Release"
-        INSTALL_RPATH "${CEF_ROOT}/Release"
+        INSTALL_RPATH "$ORIGIN"
     )
 endif()
+
+install(TARGETS cef_worker DESTINATION ${CEF_DATA_DIR})

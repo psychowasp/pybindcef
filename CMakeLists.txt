@@ -12,21 +12,23 @@ else()
         set(CEF_ROOT "$ENV{HOME}/Downloads/cef_binary")
     endif()
 endif()
+file(TO_CMAKE_PATH "${CEF_ROOT}" CEF_ROOT)
 
 if(DEFINED ENV{CEF_DLL_WRAPPER_ROOT})
     set(CEF_DLL_WRAPPER_ROOT $ENV{CEF_DLL_WRAPPER_ROOT})
 else()
     if(WIN32)
-        set(CEF_DLL_WRAPPER_ROOT "${CEF_ROOT}\\build\\libcef_dll_wrapper\\Release")
+        set(CEF_DLL_WRAPPER_ROOT "${CEF_ROOT}/build/libcef_dll_wrapper/Release")
     else()
         set(CEF_DLL_WRAPPER_ROOT "${CEF_ROOT}/build/libcef_dll_wrapper")
     endif()
 endif()
+file(TO_CMAKE_PATH "${CEF_DLL_WRAPPER_ROOT}" CEF_DLL_WRAPPER_ROOT)
 
 message(STATUS "CEF_ROOT: ${CEF_ROOT}")
 message(STATUS "CEF_DLL_WRAPPER_ROOT: ${CEF_DLL_WRAPPER_ROOT}")
 
-find_package(Python COMPONENTS Interpreter Development REQUIRED)
+find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 REQUIRED)
 
@@ -39,6 +41,12 @@ set(SOURCES
     src/handlers/lifespan_handler.cpp
     src/handlers/render_handler.cpp
     src/handlers/download_handler.cpp
+    src/handlers/load_handler.cpp
+    src/handlers/display_handler.cpp
+    src/handlers/context_menu_handler.cpp
+    src/handlers/jsdialog_handler.cpp
+    src/handlers/find_handler.cpp
+    src/handlers/request_handler.cpp
 )
 
 if(WIN32)
@@ -56,24 +64,45 @@ elseif(UNIX AND NOT APPLE AND NOT ANDROID)
     )
 endif()
 
-pybind11_add_module(pybindcef ${SOURCES})
+pybind11_add_module(_pybindcef ${SOURCES})
 
 if(WIN32)
-    target_link_libraries(pybindcef PRIVATE
+    target_link_libraries(_pybindcef PRIVATE
         ${CEF_DLL_WRAPPER_ROOT}/libcef_dll_wrapper.lib
         ${CEF_ROOT}/Release/libcef.lib
         d3d11.lib
         opengl32.lib
     )
-    set_property(TARGET pybindcef PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+    set_property(TARGET _pybindcef PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
 else()
-    target_link_libraries(pybindcef PRIVATE
+    target_link_libraries(_pybindcef PRIVATE
         ${CEF_DLL_WRAPPER_ROOT}/libcef_dll_wrapper.a
         ${CEF_ROOT}/Release/libcef.so
     )
-    set_target_properties(pybindcef PROPERTIES
-        INSTALL_RPATH_USE_LINK_PATH TRUE
+    set_target_properties(_pybindcef PROPERTIES
+        INSTALL_RPATH "$ORIGIN/../pybindcef.libs"
     )
 endif()
 
-install(TARGETS pybindcef DESTINATION .)
+install(TARGETS _pybindcef DESTINATION .)
+
+if(WIN32)
+    if(DEFINED SKBUILD_DATA_DIR)
+        set(CEF_DATA_DIR "${SKBUILD_DATA_DIR}/share/pybindcef")
+    else()
+        set(CEF_DATA_DIR "share/pybindcef")
+    endif()
+else()
+    set(CEF_DATA_DIR "../pybindcef.libs")
+endif()
+
+if(WIN32)
+    install(DIRECTORY ${CEF_ROOT}/Release/ DESTINATION ${CEF_DATA_DIR} FILES_MATCHING PATTERN "*.dll" PATTERN "*.bin")
+    install(DIRECTORY ${CEF_ROOT}/Resources/ DESTINATION ${CEF_DATA_DIR})
+else()
+    install(DIRECTORY ${CEF_ROOT}/Release/ DESTINATION ${CEF_DATA_DIR} FILES_MATCHING PATTERN "*.so" PATTERN "*.so.*" PATTERN "*.bin")
+    install(DIRECTORY ${CEF_ROOT}/Resources/ DESTINATION ${CEF_DATA_DIR})
+endif()
+
+add_subdirectory(cef_worker)
+

@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "pybindcef"
-version = "0.1.0"
+version = "0.2.0.dev"
 description = "High-performance Python bindings for Chromium Embedded Framework (CEF)"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -16,9 +16,11 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
 ]
 dependencies = []
 
 [tool.scikit-build]
 cmake.version = ">=3.15"
 wheel.install-dir = "pybindcef"
+wheel.packages = ["src/pybindcef"]
